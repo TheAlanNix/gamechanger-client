@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gamechanger_client"
+version = "0.0.2"
+authors = [{ name = "Alan Nix", email = "alan@alannix.com" }]
+description = "An easy-to-use wrapper for interacting with the GameChanger APIs"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/TheAlanNix/gamechanger-client"
+Issues = "https://github.com/TheAlanNix/gamechanger-client/issues"
