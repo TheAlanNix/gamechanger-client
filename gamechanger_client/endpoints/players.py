@@ -8,6 +8,9 @@ class PlayersEndpoint(RestEndpoint):
     def __init__(self, session):
         super().__init__(session, 'players')
 
+    def delete(self, player_id):
+        return super().delete(f'{player_id}')
+
     def family_relationships(self, player_id):
         return super().get(f'{player_id}/family-relationships')
 
@@ -23,6 +26,3 @@ class PlayersEndpoint(RestEndpoint):
         }
 
         return super().patch(f'{player_id}/family-relationships')
-
-    def teams(self, organization_id, page=0):
-        return super().get(f'{organization_id}/teams?page_starts_at={page}')

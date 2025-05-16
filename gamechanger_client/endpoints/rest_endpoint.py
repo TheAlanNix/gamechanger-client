@@ -90,6 +90,24 @@ class RestEndpoint:
 
         return result
 
+    def delete(self, url=None, **request_params):
+        """A method to perform a get request.
+
+        Args:
+          url (str): A string representing additional url.
+          request_params (any): A dictionary of parameters to add to the request.
+
+        Returns:
+            dict: JSON containing the retrieved object(s)
+        """
+        params = self._build_dict_from_items(request_params)
+
+        response = self._session.delete(
+            self._build_url(url), params=params
+        )
+
+        return response.text
+
     def get(self, url=None, **request_params):
         """A method to perform a get request.
 

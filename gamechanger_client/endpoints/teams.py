@@ -26,23 +26,21 @@ class TeamsEndpoint(RestEndpoint):
                team_type='admin',
                ngb=[]):
         team_data = {
-            'team': {
-                'id': uuid.uuid1(),
-                'name': name,
-                'sport': sport,
-                'city': city,
-                'state': state,
-                'country': country,
-                'season_name': season_name,
-                'season_year': season_year,
-                'age_group': age_group,
-                'competition_level': competition_level,
-                'team_type': team_type,
-                'ngb': ngb
-            }
+            'id': str(uuid.uuid1()),
+            'name': name,
+            'sport': sport,
+            'city': city,
+            'state': state,
+            'country': country,
+            'season_name': season_name,
+            'season_year': season_year,
+            'age_group': age_group,
+            'competition_level': competition_level,
+            'team_type': team_type,
+            'ngb': ngb
         }
 
-        return super().post('/', json=team_data)
+        return super().post('/', team=team_data)
 
     def create_event(self,
                      team_id,
@@ -56,67 +54,77 @@ class TeamsEndpoint(RestEndpoint):
                      full_day=False,
                      time_zone='America/New_York',
                      should_notify=False,
-                     message=None,
+                     message='',
                      opponent_id=None,
                      opponent_name=None,
                      title=None):
         event_data = {
-            'event': {
-                'id': uuid.uuid1(),
-                'team_id': team_id,
-                'event_type': event_type,
-                'sub_type': sub_type,
-                'status': status,
-                'full_day': full_day,
-                'timezone': time_zone,
-                'start': {
-                    'datetime': start_time
-                },
-                'end': {
-                    'datetime': end_time
-                },
-                'arrive': {
-                    'datetime': arrive_time
-                },
-                'location': {
-                    'name': location
-                }
+            'id': str(uuid.uuid1()),
+            'team_id': team_id,
+            'event_type': event_type,
+            'sub_type': sub_type,
+            'status': status,
+            'full_day': full_day,
+            'timezone': time_zone,
+            'start': {
+                'datetime': start_time
             },
-            'notification': {
-                'should_notify': should_notify,
-                'message': message
+            'end': {
+                'datetime': end_time
+            },
+            'arrive': {
+                'datetime': arrive_time
+            },
+            'location': {
+                'name': location
             }
         }
 
+        if title:
+            event_data['title'] = title
+
+        pregame_data = None
         if opponent_id and opponent_name:
-            event_data['pregame_data'] = {
+            pregame_data = {
                 'opponent_id': opponent_id,
                 'opponent_name': opponent_name
             }
 
-        if title:
-            event_data['event']['title'] = title
+        notification_data = {
+            'should_notify': should_notify,
+            'message': message
+        }
 
-        return super().post(f'{team_id}/schedule/events/', json=event_data)
+        if pregame_data:
+            return super().post(f'{team_id}/schedule/events/', event=event_data, notification=notification_data, pregame_data=pregame_data)
+        else:
+            return super().post(f'{team_id}/schedule/events/', event=event_data, notification=notification_data)
 
     def create_player(self, team_id, first_name, last_name, number, batting_side=None, throwing_hand=None):
         player_data = {
-            "player": {
-                "id": uuid.uuid1(),
-                "team_id": team_id,
-                "first_name": first_name,
-                "last_name": last_name,
-                "number": number
-            }
+            'id': str(uuid.uuid1()),
+            'team_id': team_id,
+            'first_name': first_name,
+            'last_name': last_name,
+            'number': number
         }
 
         if batting_side or throwing_hand:
-            player_data['player']['bats'] = {
+            player_data['bats'] = {
                 'batting_side': batting_side,
-                'thowing_hand': throwing_hand
+                'throwing_hand': throwing_hand
             }
 
-        return super().post(f'{team_id}/players/', json=player_data)
+        return super().post(f'{team_id}/players/', player=player_data)
+
+    def delete(self, team_id):
+        return super().delete(f'{team_id}')
+
+    def delete_event(self, team_id, event_id, should_notify=False, message=''):
+        event_data = {'event': {'status': 'canceled'}}
+        notification_data = {'should_notify': should_notify, 'message': message}
+
+        return super().patch(f'{team_id}/schedule/events/{event_id}', updates=event_data, notification=notification_data)
 
     def game_summaries(self, team_id):
         return super().get(f'{team_id}/game-summaries')
