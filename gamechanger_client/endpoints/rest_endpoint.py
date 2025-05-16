@@ -94,7 +94,7 @@ class RestEndpoint:
         """A method to perform a get request.
 
         Args:
-          id (str): A string representing additional url.
+          url (str): A string representing additional url.
           request_params (any): A dictionary of parameters to add to the request.
 
         Returns:
@@ -108,11 +108,31 @@ class RestEndpoint:
 
         return response.json()
 
+    def patch(self, url=None, **request_params):
+        """A method to perform a patch request.
+
+        Args:
+          url (str): A string representing additional url.
+          request_params (any): Request parameters.
+
+        Returns:
+            dict: JSON containing the new object info
+
+        """
+
+        json = self._build_dict_from_items(request_params)
+
+        response = self._session.patch(
+            self._build_url(url), json=json
+        )
+
+        return response.json()
+
     def post(self, url=None, **request_params):
         """A method to perform a post request.
 
         Args:
-          params (any):  Parameters
+          url (str): A string representing additional url.
           request_params (any): Request parameters.
 
         Returns:

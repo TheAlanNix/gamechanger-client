@@ -14,6 +14,7 @@ from gamechanger_client.http_session import HttpSession
 from .endpoints.clips import ClipsEndpoint
 from .endpoints.me import MeEndpoint
 from .endpoints.organizations import OrganizationsEndpoint
+from .endpoints.players import PlayersEndpoint
 from .endpoints.public import PublicEndpoint
 from .endpoints.search import SearchEndpoint
 from .endpoints.teams import TeamsEndpoint
@@ -47,6 +48,7 @@ class GameChangerClient:
         self.clips = ClipsEndpoint(self._session)
         self.me = MeEndpoint(self._session)
         self.organizations = OrganizationsEndpoint(self._session)
+        self.players = PlayersEndpoint(self._session)
         self.public = PublicEndpoint(self._session)
         self.search = SearchEndpoint(self._session)
         self.teams = TeamsEndpoint(self._session)
