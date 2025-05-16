@@ -11,6 +11,9 @@ class MeEndpoint(RestEndpoint):
     def organizations(self):
         return super().get('organizations')
 
+    def subscription_information(self):
+        return super().get('subscription-information')
+
     def teams(self):
         return super().get('teams')
 
