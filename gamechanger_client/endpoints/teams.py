@@ -135,6 +135,9 @@ class TeamsEndpoint(RestEndpoint):
     def event_video_stream_playback_info(self, team_id, event_id):
         return super().get(f'{team_id}/schedule/events/{event_id}/video-stream/assets/playback')
 
+    def opponents(self, team_id):
+        return super().get(f'{team_id}/opponents')
+
     def players(self, team_id):
         return super().get(f'{team_id}/players')
 
