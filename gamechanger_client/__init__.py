@@ -18,7 +18,21 @@ from .endpoints.players import PlayersEndpoint
 from .endpoints.public import PublicEndpoint
 from .endpoints.search import SearchEndpoint
 from .endpoints.teams import TeamsEndpoint
-from .version import __version__  # noqa: F401
+from .version import __version__
+
+# Expose version at package level
+__all__ = [
+    'GameChangerClient',
+    'HttpSession',
+    'ClipsEndpoint',
+    'MeEndpoint', 
+    'OrganizationsEndpoint',
+    'PlayersEndpoint',
+    'PublicEndpoint',
+    'SearchEndpoint',
+    'TeamsEndpoint',
+    '__version__'
+]
 
 logger = logging.getLogger(__name__)
 

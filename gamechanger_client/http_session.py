@@ -11,15 +11,18 @@ from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from gamechanger_client import version
 from gamechanger_client.config import (
     DEFAULT_ACCESS_TOKEN_EXPIRATION,
     DEFAULT_BASE_DOMAIN,
     DEFAULT_SUCCESS_RESPONSE_CODES,
 )
 from gamechanger_client.exceptions import ApiError, MalformedResponse
+from gamechanger_client.version import __version__
 
 logger = logging.getLogger('gamechanger-client.http-session')
+
+# Define user agent once at module level
+USER_AGENT = f'gamechanger-python-client/{__version__}'
 
 
 class HttpSession:
@@ -29,13 +32,14 @@ class HttpSession:
 
     _gc_token = None
 
-    def __init__(self, gc_token, base_domain=None):
+    def __init__(self, gc_token, base_domain=None, user_agent=None):
         """
             Initializes the HttpSession object.
 
         Args:
             gc_token (str): a GameChanger token
             base_domain (str): a domain (defaults to "api.team-manager.gc.com")
+            user_agent (str): custom user agent string (defaults to SDK version)
 
         Returns:
             HttpSession: An instance of this class
@@ -52,6 +56,8 @@ class HttpSession:
         self._base_url = f"https://{self._base_domain}"
 
         self._gc_token = gc_token
+        self._user_agent = user_agent or USER_AGENT
+        
         # Get an access token
         self._check_access_token()
 
@@ -148,7 +154,7 @@ class HttpSession:
         headers = self._session.headers
 
         headers['gc-token'] = self._gc_token
-        headers['user-agent'] = 'gamechanger-python-client'
+        headers['user-agent'] = self._user_agent
         headers['x-pagination'] = 'true'
 
         logger.debug('Request headers: \n' + json.dumps(dict(headers), indent=2))

@@ -129,6 +129,9 @@ class TeamsEndpoint(RestEndpoint):
     def game_summaries(self, team_id):
         return super().get(f'{team_id}/game-summaries')
 
+    def event_player_stats(self, team_id, event_id):
+        return super().get(f'{team_id}/schedule/events/{event_id}/player-stats')
+
     def event_video_stream_assets(self, team_id, event_id):
         return super().get(f'{team_id}/schedule/events/{event_id}/video-stream/assets')
 
