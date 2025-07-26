@@ -3,4 +3,4 @@
 Package version.
 """
 
-__version__ = '2025.07.18'
+__version__ = '2025.07.25'

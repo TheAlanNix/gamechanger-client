@@ -13,6 +13,9 @@ class TeamsEndpoint(RestEndpoint):
     def associations(self, team_id):
         return super().get(f'{team_id}/associations')
 
+    def avatar_image(self, team_id):
+        return super().get(f'{team_id}/avatar-image')
+
     def create(self,
                name,
                sport,
