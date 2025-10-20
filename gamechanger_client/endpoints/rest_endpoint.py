@@ -31,6 +31,9 @@ class RestEndpoint:
             str: a formatted URL
 
         """
+        if url.startswith('http'):
+            return url
+
         result = f"{self._session._base_url}/{self._endpoint_root}"
 
         if url:
@@ -123,6 +126,14 @@ class RestEndpoint:
         response = self._session.get(
             self._build_url(url), params=params
         )
+
+        next_page = response.headers.get('x-next-page')
+        if next_page:
+            # If the next page is present, we need to fetch it
+            next_page_data = self.get(next_page, **request_params)
+            response_json = response.json()
+            response_json.extend(next_page_data)
+            return response_json
 
         return response.json()
 

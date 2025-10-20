@@ -12,13 +12,28 @@ import uuid
 from gamechanger_client.http_session import HttpSession
 
 from .endpoints.clips import ClipsEndpoint
+from .endpoints.game_streams import GameStreamsEndpoint
 from .endpoints.me import MeEndpoint
 from .endpoints.organizations import OrganizationsEndpoint
 from .endpoints.players import PlayersEndpoint
 from .endpoints.public import PublicEndpoint
 from .endpoints.search import SearchEndpoint
 from .endpoints.teams import TeamsEndpoint
-from .version import __version__  # noqa: F401
+from .version import __version__
+
+# Expose version at package level
+__all__ = [
+    'GameChangerClient',
+    'HttpSession',
+    'ClipsEndpoint',
+    'MeEndpoint', 
+    'OrganizationsEndpoint',
+    'PlayersEndpoint',
+    'PublicEndpoint',
+    'SearchEndpoint',
+    'TeamsEndpoint',
+    '__version__'
+]
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +61,7 @@ class GameChangerClient:
         self._session = HttpSession(self._gc_token)
 
         self.clips = ClipsEndpoint(self._session)
+        self.game_streams = GameStreamsEndpoint(self._session)
         self.me = MeEndpoint(self._session)
         self.organizations = OrganizationsEndpoint(self._session)
         self.players = PlayersEndpoint(self._session)

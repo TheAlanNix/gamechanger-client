@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gamechanger_client"
-version = "0.0.2"
+version = "0.0.4"
 authors = [{ name = "Alan Nix", email = "alan@alannix.com" }]
 description = "An easy-to-use wrapper for interacting with the GameChanger APIs"
 readme = "README.md"
