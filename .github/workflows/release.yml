@@ -1,0 +1,110 @@
+name: Release to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write  # For trusted publishing to PyPI
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Switch to main branch
+      run: |
+        # Get the default branch name
+        DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+        echo "Default branch: $DEFAULT_BRANCH"
+        git checkout $DEFAULT_BRANCH
+        git pull origin $DEFAULT_BRANCH
+        echo "Current branch: $(git branch --show-current)"
+        echo "Current commit: $(git rev-parse HEAD)"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine toml
+
+    - name: Get release version
+      id: get_version
+      run: |
+        # Extract version from release tag (remove 'v' prefix if present)
+        VERSION="${{ github.event.release.tag_name }}"
+        VERSION="${VERSION#v}"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        
+        # Generate date-based version for version.py
+        DATE_VERSION=$(date '+%Y.%m.%d')
+        echo "date_version=$DATE_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Update pyproject.toml version
+      run: |
+        python -c "
+        import toml
+        
+        # Read current pyproject.toml
+        with open('pyproject.toml', 'r') as f:
+            data = toml.load(f)
+        
+        # Update version
+        data['project']['version'] = '${{ steps.get_version.outputs.version }}'
+        
+        # Write back
+        with open('pyproject.toml', 'w') as f:
+            toml.dump(data, f)
+        
+        print(f'Updated pyproject.toml version to: ${{ steps.get_version.outputs.version }}')
+        "
+
+    - name: Update version.py
+      run: |
+        cat > gamechanger_client/version.py << 'EOF'
+        # -*- coding: utf-8 -*-
+        """
+        Package version.
+        """
+        
+        __version__ = '${{ steps.get_version.outputs.date_version }}'
+        EOF
+        echo "Updated version.py to: ${{ steps.get_version.outputs.date_version }}"
+
+    - name: Commit version updates
+      run: |
+        # Get the default branch name
+        DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+        echo "Pushing to branch: $DEFAULT_BRANCH"
+        
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add pyproject.toml gamechanger_client/version.py
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update versions for release ${{ steps.get_version.outputs.version }}"
+          git push origin $DEFAULT_BRANCH
+        fi
+
+    - name: Build package
+      run: python -m build
+
+    - name: Publish to PyPI (Trusted Publishing)
+      uses: pypa/gh-action-pypi-publish@release/v1
+
+    - name: Verify installation
+      run: |
+        sleep 30  # Wait for PyPI to process the upload
+        pip install gamechanger_client==${{ steps.get_version.outputs.version }}
+        python -c "import gamechanger_client; print(f'Successfully installed version: {gamechanger_client.__version__}')"
