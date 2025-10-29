@@ -31,7 +31,7 @@ class RestEndpoint:
             str: a formatted URL
 
         """
-        if url.startswith('http'):
+        if type(url) is str and url.startswith('http'):
             return url
 
         result = f"{self._session._base_url}/{self._endpoint_root}"
