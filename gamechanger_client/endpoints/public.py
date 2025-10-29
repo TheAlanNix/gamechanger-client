@@ -8,11 +8,17 @@ class PublicEndpoint(RestEndpoint):
     def __init__(self, session):
         super().__init__(session, 'public')
 
+    def organization_events(self, organization_id):
+        return super().get(f'organizations/{organization_id}/events')
+
     def organization_standings(self, organization_id):
-        return super().get(f'organization/{organization_id}/standings')
+        return super().get(f'organizations/{organization_id}/standings')
+
+    def organization_team_records(self, organization_id):
+        return super().get(f'organizations/{organization_id}/team-records')
 
     def organization_teams(self, organization_id):
-        return super().get(f'organization/{organization_id}/teams')
+        return super().get(f'organizations/{organization_id}/teams')
 
     def teams(self, team_public_id):
         return super().get(f'teams/{team_public_id}')
