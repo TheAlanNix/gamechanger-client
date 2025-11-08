@@ -16,7 +16,7 @@ from gamechanger_client.config import (
     DEFAULT_BASE_DOMAIN,
     DEFAULT_SUCCESS_RESPONSE_CODES,
 )
-from gamechanger_client.exceptions import ApiError, MalformedResponse
+from gamechanger_client.exceptions import ApiError, MalformedResponse, SchemaValidationError
 from gamechanger_client.version import __version__
 
 logger = logging.getLogger('gamechanger-client.http-session')
@@ -109,9 +109,38 @@ class HttpSession:
             pass
         # elif response.status_code == RATE_LIMIT_RESPONSE_CODE:
         #     raise RateLimitError(response)
+        elif response.status_code == 400:
+            # Check if this is a schema validation error
+            if self._is_schema_validation_error(response):
+                raise SchemaValidationError(response)
+            else:
+                # Regular 400 error
+                raise ApiError(response)
         else:
-            print(response.raw)
+            print(response.text)
             raise ApiError(response)
+    
+    def _is_schema_validation_error(self, response):
+        """
+        Check if a 400 response contains schema validation error information.
+        
+        Args:
+            response: The HTTP response object
+            
+        Returns:
+            bool: True if this appears to be a schema validation error
+        """
+        if 'application/json' not in response.headers.get('Content-Type', '').lower():
+            return False
+            
+        try:
+            data = response.json()
+            # Check if response has both 'schema' and 'errors' keys, which indicates schema validation
+            return (isinstance(data, dict) and 
+                   'schema' in data and 
+                   'errors' in data)
+        except (ValueError, TypeError):
+            return False
 
     def _print_debug_response(self, response):
         """
